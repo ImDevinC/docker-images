@@ -38,4 +38,4 @@ RUN git clone https://github.com/CouchPotato/CouchPotatoServer.git /usr/src/couc
     && git checkout "${CP_VERSION}"
 
 ENTRYPOINT ["python", "CouchPotato.py"]
-CMD ["--data_dir", "/data"]
+CMD ["--data_dir", "/data", "--console_log"]
