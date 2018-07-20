@@ -23,9 +23,7 @@ RUN groupadd -r -g 666 couchpotato \
     && useradd -r -u 666 -g 666 -ms /bin/false couchpotato \
     && chown couchpotato:couchpotato /usr/src/couchpotato
 
-USER couchpotato
-
-RUN pip install --user \
+RUN pip install \
         lxml \
         pyopenssl
 
@@ -33,6 +31,7 @@ EXPOSE 5050
 
 ENV CP_VERSION master
 
+USER couchpotato
 RUN git clone https://github.com/CouchPotato/CouchPotatoServer.git /usr/src/couchpotato \
     && cd /usr/src/couchpotato \
     && git checkout "${CP_VERSION}"
