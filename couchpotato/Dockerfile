@@ -1,4 +1,6 @@
 # Adapted from https://hub.docker.com/r/couchpotato/couchpotato/~/dockerfile/
+# Run command:
+#   docker run -d --restart always -v $(pwd):/data -v ${MEDIA_PATH}:/media -p 5050:5050 --rm imdevinc/couchpotato
 
 FROM alpine:latest
 LABEL maintainer Devin Collins <me@imdevinc.com>
