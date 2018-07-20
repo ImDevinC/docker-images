@@ -5,7 +5,7 @@ FROM alpine:latest
 LABEL maintainer Devin Collins <me@imdevinc.com>
 WORKDIR /usr/src/nzbget
 EXPOSE 6789
-
+COPY nzbget.conf .
 RUN apk add --no-cache \
     curl \
     p7zip \
@@ -23,4 +23,6 @@ RUN curl -o /tmp/nzbget.run -L https://nzbget.net/download/nzbget-latest-bin-lin
     && sh /tmp/nzbget.run --destdir /usr/src/nzbget \
     && rm -rf /tmp/*
 
-ENTRYPOINT ["./nzbget", "-s", "-o", "outputmode=log"]
+
+
+ENTRYPOINT ["./nzbget", "-s", "-o", "outputmode=log", "-c", "nzbget.conf"]
