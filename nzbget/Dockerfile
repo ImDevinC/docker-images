@@ -1,5 +1,5 @@
 # Run command:
-#   docker run -d --restart always -v ${DOWNLOAD_PATH}:/downloads -v ${CONFIG_PATH}:/nzbget.conf --network plex-net -p 6789:6789 --name nzbget imdevinc/nzbget
+#   docker run -d --restart always -v ${DOWNLOAD_PATH}:/downloads -v ${CONFIG_PATH}:/data --network plex-net -p 6789:6789 --name nzbget imdevinc/nzbget
 # Downloads volume needs to be have read/write access for uid/gid 666
 
 FROM alpine:latest
@@ -24,4 +24,4 @@ RUN curl -o /tmp/nzbget.run -L https://nzbget.net/download/nzbget-latest-bin-lin
     && rm -rf /tmp/*
 
 ENTRYPOINT ["./nzbget", "-s", "-o", "outputmode=log"]
-CMD ["-c", "/nzbget.conf"]
+CMD ["-c", "/data/nzbget.conf"]
