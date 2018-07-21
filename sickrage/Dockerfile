@@ -1,5 +1,6 @@
 # Run command:
-#   docker run -v ${CONFIG_PATH}:/data -v ${MEDIA_PATH}:/media -p 8081:8081 --rm imdevinc/sickrage
+#   docker run -d --restart always -v ${CONFIG_PATH}:/data -v ${DOWNLOAD_PATH}:/downloads -v ${MEDIA_PATH}:/media --network plex-net -p 8081:8081 imdevinc/sickrage
+# Downloads volume needs to be have read/write access for uid/gid 666
 
 FROM alpine:latest
 LABEL maintainer Devin Collins <me@imdevinc.com>

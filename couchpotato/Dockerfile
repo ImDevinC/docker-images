@@ -1,6 +1,6 @@
 # Adapted from https://hub.docker.com/r/couchpotato/couchpotato/~/dockerfile/
 # Run command:
-#   docker run -d --restart always -v $(pwd):/data -v ${MOVIE_PATH}:/movies -v ${DOWNLOAD_PATH}:/downloads -p 5050:5050 --rm imdevinc/couchpotato
+#   docker run -d --restart always -v ${DATA_PATH}:/data -v ${MOVIE_PATH}:/movies -v ${DOWNLOAD_PATH}:/downloads --network plex-net -p 5050:5050 --name couchpotato imdevinc/couchpotato
 # Make sure that the /data, /movies and /downloads volumes are readable/writeable by UID/GID 666
 
 FROM alpine:latest

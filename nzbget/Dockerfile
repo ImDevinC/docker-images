@@ -1,5 +1,6 @@
 # Run command:
-#   docker run -v $(pwd)/config:/config -v $(pwd)/downloads:/downloads -p 6789:6789 --rm --name nzbget imdevinc/nzbget
+#   docker run -d --restart always -v ${DOWNLOAD_PATH}:/downloads --network plex-net -p 6789:6789 --name nzbget imdevinc/nzbget
+# Downloads volume needs to be have read/write access for uid/gid 666
 
 FROM alpine:latest
 LABEL maintainer Devin Collins <me@imdevinc.com>
@@ -22,7 +23,5 @@ USER nzbget
 RUN curl -o /tmp/nzbget.run -L https://nzbget.net/download/nzbget-latest-bin-linux.run \
     && sh /tmp/nzbget.run --destdir /usr/src/nzbget \
     && rm -rf /tmp/*
-
-
 
 ENTRYPOINT ["./nzbget", "-s", "-o", "outputmode=log", "-c", "nzbget.conf"]
