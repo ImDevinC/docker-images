@@ -1,12 +1,11 @@
 # Run command:
-#   docker run -d --restart always -v ${DOWNLOAD_PATH}:/downloads --network plex-net -p 6789:6789 --name nzbget imdevinc/nzbget
+#   docker run -d --restart always -v ${DOWNLOAD_PATH}:/downloads -v ${CONFIG_PATH}:/nzbget.conf --network plex-net -p 6789:6789 --name nzbget imdevinc/nzbget
 # Downloads volume needs to be have read/write access for uid/gid 666
 
 FROM alpine:latest
 LABEL maintainer Devin Collins <me@imdevinc.com>
 WORKDIR /usr/src/nzbget
 EXPOSE 6789
-COPY nzbget.conf .
 RUN apk add --no-cache \
     curl \
     p7zip \
@@ -24,4 +23,5 @@ RUN curl -o /tmp/nzbget.run -L https://nzbget.net/download/nzbget-latest-bin-lin
     && sh /tmp/nzbget.run --destdir /usr/src/nzbget \
     && rm -rf /tmp/*
 
-ENTRYPOINT ["./nzbget", "-s", "-o", "outputmode=log", "-c", "nzbget.conf"]
+ENTRYPOINT ["./nzbget", "-s", "-o", "outputmode=log"]
+CMD ["-c", "/nzbget.conf"]
