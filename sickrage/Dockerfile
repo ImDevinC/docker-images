@@ -1,5 +1,5 @@
 # Run command:
-#   docker run -d --restart always -v ${CONFIG_PATH}:/data -v ${DOWNLOAD_PATH}:/downloads -v ${MEDIA_PATH}:/media --network plex-net -p 8081:8081 imdevinc/sickrage
+#   docker run -d --restart always -v ${CONFIG_PATH}:/data -v ${DOWNLOAD_PATH}:/downloads -v ${ANIME_PATH}:/anime -v ${TV_PATH}:/tv\ shows --network plex-net -p 8081:8081 --name sickrage  imdevinc/sickrage
 # Downloads volume needs to be have read/write access for uid/gid 666
 
 FROM alpine:latest
