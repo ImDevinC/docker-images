@@ -22,8 +22,9 @@ RUN apk add --no-cache \
         shadow \
         && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r -g 666 couchpotato \
-    && useradd -r -u 666 -g 666 -ms /bin/false couchpotato \
+RUN groupadd -r -g 600 media \
+    && groupadd -r -g 603 couchpotato \
+    && useradd -r -u 603 -g couchpotato -G media -ms /bin/false couchpotato \
     && chown couchpotato:couchpotato /usr/src/couchpotato
 
 RUN pip install \

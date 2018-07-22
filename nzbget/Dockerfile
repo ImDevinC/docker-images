@@ -14,8 +14,9 @@ RUN apk add --no-cache \
     wget \
     shadow \
     && rm -rf /var/lib/apt/lists/* && \
-    groupadd -r -g 666 nzbget \
-    && useradd -r -u 666 -g 666 -ms /bin/false nzbget \
+    groupadd -r -g 600 media \
+    && groupadd -r -g 601 nzbget \
+    && useradd -r -u 601 -g nzbget -G media -ms /bin/false nzbget \
     && chown nzbget:nzbget /usr/src/nzbget
 
 USER nzbget
