@@ -7,7 +7,7 @@ services:
     ports:
       - "32400:32400"
     volumes:
-      - /etc/plex/Plex\ Media\ Server:/config
+      - /etc/plex/Plex Media Server:/config
       - /mnt/media:/data
       - /etc/localtime:/etc/localtime:ro
     environment:
@@ -16,7 +16,7 @@ services:
     networks:
       - plex-net
   nzbget:
-    build: nzbget
+    image: imdevinc/nzbget
     ports:
       - "6789:6789"
     volumes:
@@ -33,12 +33,12 @@ services:
       - /etc/sickrage:/data
       - /mnt/media/Downloads/SickRage:/downloads
       - /mnt/media/Anime:/anime
-      - /mnt/media/TV\ Shows:/tv\ shows
+      - /mnt/media/TV Shows:/tv shows
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
   couchpotato:
-    build: couchpotato
+    image: imdevinc/couchpotato
     ports:
       - "5050:5050"
     volumes:
@@ -58,7 +58,7 @@ services:
     networks:
       - plex-net
   tautulli:
-    build: tautulli
+    image: imdevinc/tautulli
     ports:
       - "8181:8181"
     volumes:
