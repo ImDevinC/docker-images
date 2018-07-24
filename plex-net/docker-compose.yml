@@ -1,0 +1,68 @@
+version: '3'
+networks:
+  plex-net:
+services:
+  plex:
+    image: plexinc/pms-docker
+    ports:
+      - "32400:32400"
+    volumes:
+      - /etc/plex/Plex\ Media\ Server:/config
+      - /mnt/media:/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PLEX_UID=604
+      - ALLOWED_NETWORKS='192.168.1.0/24'
+    networks:
+      - plex-net
+  nzbget:
+    build: nzbget
+    ports:
+      - "6789:6789"
+    volumes:
+      - /mnt/media/Downloads:/downloads
+      - /etc/nzbget:/data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - plex-net
+  sickrage:
+    image: imdevinc/sickrage
+    ports:
+      - "8081:8081"
+    volumes:
+      - /etc/sickrage:/data
+      - /mnt/media/Downloads/SickRage:/downloads
+      - /mnt/media/Anime:/anime
+      - /mnt/media/TV\ Shows:/tv\ shows
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - plex-net
+  couchpotato:
+    build: couchpotato
+    ports:
+      - "5050:5050"
+    volumes:
+      - /etc/couchpotato:/data
+      - /mnt/media/Movies:/movies
+      - /mnt/media/Downloads/CouchPotato:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - plex-net
+  ombi:
+    image: lsiodev/ombi-preview
+    ports:
+      - "3579:3579"
+    volumes:
+      - /etc/ombi:/conf
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - plex-net
+  tautulli:
+    build: tautulli
+    ports:
+      - "8181:8181"
+    volumes:
+      - /etc/tautulli:/data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - plex-net
