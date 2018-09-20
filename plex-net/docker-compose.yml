@@ -3,16 +3,16 @@ networks:
   plex-net:
 services:
   plex:
-    image: plexinc/pms-docker
+    image: plexinc/pms-docker:plexpass
     ports:
       - "32400:32400"
     volumes:
-      - /etc/plex/Plex Media Server:/config
+      - plex_data:/config
       - /mnt/media:/data
       - /etc/localtime:/etc/localtime:ro
     environment:
       - PLEX_UID=604
-      - ALLOWED_NETWORKS='192.168.1.0/24'
+      - PLEX_GID=600
     networks:
       - plex-net
   nzbget:
@@ -21,7 +21,7 @@ services:
       - "6789:6789"
     volumes:
       - /mnt/media/Downloads:/downloads
-      - /etc/nzbget:/data
+      - nzbget_data:/data
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
@@ -30,7 +30,7 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - /etc/sickrage:/data
+      - sickrage_data:/data
       - /mnt/media/Downloads/SickRage:/downloads
       - /mnt/media/Anime:/anime
       - /mnt/media/TV Shows:/tv shows
@@ -42,7 +42,7 @@ services:
     ports:
       - "5050:5050"
     volumes:
-      - /etc/couchpotato:/data
+      - cp_data:/data
       - /mnt/media/Movies:/movies
       - /mnt/media/Downloads/CouchPotato:/downloads
       - /etc/localtime:/etc/localtime:ro
@@ -53,7 +53,7 @@ services:
     ports:
       - "3579:3579"
     volumes:
-      - /etc/ombi:/conf
+      - ombi_data:/config
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
@@ -62,7 +62,22 @@ services:
     ports:
       - "8181:8181"
     volumes:
-      - /etc/tautulli:/data
+      - tautulli_data:/data
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+  nginx:
+    image: imdevinc/nginx-plex-net
+    ports:
+      - "80:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - plex-net
+volumes:
+  cp_data:
+  tautulli_data:
+  plex_data:
+  nzbget_data:
+  sickrage_data:
+  ombi_data:

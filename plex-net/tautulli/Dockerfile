@@ -6,10 +6,13 @@ RUN apk add --no-cache \
     git \
     python \
     shadow \
+    py-setuptools \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd -u 605 -ms /bin/false tautulli \
-    && chown tautulli:tautulli /usr/src/tautulli
-
+    && useradd -ms /bin/false tautulli \
+    && chown tautulli:tautulli /usr/src/tautulli \
+    && mkdir /data \
+    && chown tautulli:tautulli /data
+VOLUME /data
 USER tautulli
 RUN git clone https://github.com/Tautulli/Tautulli.git .
 

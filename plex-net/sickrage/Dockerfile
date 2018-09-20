@@ -15,13 +15,13 @@ RUN apk add --no-cache \
     openssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r -g 600 media \
-    && groupadd -r -g 602 sickrage \
-    && useradd -r -u 602 -g sickrage -G media -ms /bin/false sickrage \
-    && chown sickrage:sickrage /usr/src/sickrage
+RUN useradd -ms /bin/false sickrage \
+    && chown sickrage: /usr/src/sickrage \
+    && mkdir /data \
+    && chown sickrage: /data
 
 EXPOSE 8081
-
+VOLUME /data
 ENV SR_VERSION master
 
 USER sickrage

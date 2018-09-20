@@ -22,23 +22,20 @@ RUN apk add --no-cache \
         shadow \
         && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r -g 600 media \
-    && groupadd -r -g 603 couchpotato \
-    && useradd -r -u 603 -g couchpotato -G media -ms /bin/false couchpotato \
-    && chown couchpotato:couchpotato /usr/src/couchpotato
+RUN useradd -ms /bin/false couchpotato \
+    && chown couchpotato: /usr/src/couchpotato \
+    && mkdir /data \
+    && chown couchpotato: /data
 
 RUN pip install \
         lxml \
         pyopenssl
 
 EXPOSE 5050
-
-ENV CP_VERSION master
-
+VOLUME /data
 USER couchpotato
 RUN git clone https://github.com/CouchPotato/CouchPotatoServer.git /usr/src/couchpotato \
-    && cd /usr/src/couchpotato \
-    && git checkout "${CP_VERSION}"
+    && cd /usr/src/couchpotato
 
 ENTRYPOINT ["python", "CouchPotato.py"]
 CMD ["--data_dir", "/data", "--console_log"]
