@@ -10,9 +10,6 @@ services:
       - plex_data:/config
       - /mnt/media:/data
       - /etc/localtime:/etc/localtime:ro
-    environment:
-      - PLEX_UID=604
-      - PLEX_GID=600
     networks:
       - plex-net
   nzbget:
@@ -25,13 +22,13 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
-  sickrage:
-    image: imdevinc/sickrage
+  medusa:
+    image: imdevinc/medusa
     ports:
-      - "8081:8081"
+      - "8082:8081"
     volumes:
-      - sickrage_data:/data
-      - /mnt/media/Downloads/SickRage:/downloads
+      - medusa_data:/data
+      - /mnt/media/Downloads/Sickrage:/downloads
       - /mnt/media/Anime:/anime
       - /mnt/media/TV Shows:/tv shows
       - /etc/localtime:/etc/localtime:ro
@@ -81,3 +78,4 @@ volumes:
   nzbget_data:
   sickrage_data:
   ombi_data:
+  medusa_data:
