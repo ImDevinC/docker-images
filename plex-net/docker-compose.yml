@@ -76,6 +76,5 @@ volumes:
   tautulli_data:
   plex_data:
   nzbget_data:
-  sickrage_data:
   ombi_data:
   medusa_data:
