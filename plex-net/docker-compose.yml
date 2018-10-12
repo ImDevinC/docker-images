@@ -28,7 +28,7 @@ services:
       - "8081:8081"
     volumes:
       - medusa_data:/data
-      - /mnt/media/Downloads/Sickrage:/downloads
+      - /mnt/media/Downloads/SickRage:/downloads
       - /mnt/media/Anime:/anime
       - /mnt/media/TV Shows:/tv shows
       - /etc/localtime:/etc/localtime:ro
@@ -71,6 +71,15 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+  transmission:
+    image: linuxserver/transmission
+    ports:
+      - "9091:9091"
+      - "51413:51413"
+    volumes:
+      - transmission_data:/config
+      - /mnt/media/Downloads/Torrents:/downloads
+      - /etc/localtime:/etc/localtime:ro
 volumes:
   cp_data:
   tautulli_data:
@@ -78,3 +87,4 @@ volumes:
   nzbget_data:
   ombi_data:
   medusa_data:
+  transmission_data:
