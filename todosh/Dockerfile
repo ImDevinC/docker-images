@@ -1,5 +1,5 @@
 # Docker command:
-#   docker run -it -v ${TODO_FOLDER}:/todos -v ${CONFIG_FILE}:/todo.cfg -e TODOTXT_CFG_FILE=/todo.cfg imdevinc/todosh
+#   docker run -it -v ${TODO_FOLDER}:/todos imdevinc/todosh
 
 FROM alpine:latest
 LABEL maintainer Devin Collins <me@imdevinc.com>
@@ -18,5 +18,5 @@ RUN git clone https://github.com/todotxt/todo.txt-cli.git . \
     && useradd -r -ms /bin/bash todosh
 
 USER todosh
-RUN echo alias t="todo.sh" >> /home/todosh/.bashrc
-ENTRYPOINT [ "bash" ]
+COPY todo.cfg /etc/todo.cfg
+ENTRYPOINT [ "todo.sh", "-d", "/etc/todo.cfg" ]
