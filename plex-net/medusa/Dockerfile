@@ -15,21 +15,17 @@ RUN apk add --no-cache \
     openssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r -g 600 media \
-    && groupadd -r -g 602 sickrage \
-    && useradd -r -u 602 -g sickrage -G media -ms /bin/false sickrage \
-    && chown sickrage:sickrage /usr/src/sickrage
+RUN useradd -ms /bin/false sickrage \
+    && chown sickrage: /usr/src/sickrage \
+    && mkdir /data \
+    && chown sickrage: /data
 
 EXPOSE 8081
-
-ENV SR_VERSION master
+VOLUME /data
 
 USER sickrage
-RUN git clone https://github.com/SickRage/SickRage.git /usr/src/sickrage \
-    && cd /usr/src/sickrage \
-    && git checkout "${SR_VERSION}"
+RUN git clone https://github.com/pymedusa/Medusa.git /usr/src/sickrage \
+    && cd /usr/src/sickrage
 
 ENTRYPOINT ["python", "SickBeard.py", "--nolaunch"]
 CMD ["--datadir", "/data"]
-
-

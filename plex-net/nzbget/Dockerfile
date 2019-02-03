@@ -13,11 +13,12 @@ RUN apk add --no-cache \
     unrar \
     wget \
     shadow \
-    && rm -rf /var/lib/apt/lists/* && \
-    groupadd -r -g 600 media \
-    && useradd -r -u 601 -g media -ms /bin/false nzbget \
-    && chown nzbget:media /usr/src/nzbget
-
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /data \
+    && useradd -ms /bin/false nzbget \
+    && chown nzbget: /usr/src/nzbget \
+    && chown nzbget: /data
+VOLUME /data
 USER nzbget
 RUN curl -o /tmp/nzbget.run -L https://nzbget.net/download/nzbget-latest-bin-linux.run \
     && sh /tmp/nzbget.run --destdir /usr/src/nzbget \

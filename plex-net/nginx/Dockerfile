@@ -9,5 +9,6 @@ RUN apk add --no-cache \
     nginx \
     && rm -f /etc/nginx/conf.d/default.conf \
     && mkdir -p /run/nginx
+COPY plex-net.conf /etc/nginx/conf.d/plex-net.conf
 
 ENTRYPOINT [ "nginx", "-g", "daemon off;" ]
