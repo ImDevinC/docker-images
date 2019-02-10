@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 networks:
   plex-net:
 services:
@@ -12,6 +12,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+    restart: always
   nzbget:
     image: imdevinc/nzbget
     ports:
@@ -22,6 +23,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+    restart: always
   medusa:
     image: imdevinc/medusa
     ports:
@@ -34,6 +36,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+    restart: always
   couchpotato:
     image: imdevinc/couchpotato
     ports:
@@ -45,6 +48,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+    restart: always
   ombi:
     image: lsiodev/ombi-preview
     ports:
@@ -54,6 +58,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+    restart: always
   tautulli:
     image: imdevinc/tautulli
     ports:
@@ -63,6 +68,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+    restart: always
   nginx:
     image: imdevinc/nginx-plex-net
     ports:
@@ -71,6 +77,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - plex-net
+    restart: always
   transmission:
     image: linuxserver/transmission
     ports:
@@ -80,6 +87,7 @@ services:
       - transmission_data:/config
       - /mnt/media/Downloads/Torrents:/downloads
       - /etc/localtime:/etc/localtime:ro
+    restart: always
 volumes:
   cp_data:
   tautulli_data:
