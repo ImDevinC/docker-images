@@ -30,7 +30,7 @@ services:
       - "8081:8081"
     volumes:
       - medusa_data:/data
-      - /mnt/media/Downloads/SickRage:/downloads
+      - /mnt/media/Downloads:/downloads
       - /mnt/media/Anime:/anime
       - /mnt/media/TV Shows:/tv shows
       - /etc/localtime:/etc/localtime:ro
