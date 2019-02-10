@@ -20,9 +20,12 @@ RUN apk add --no-cache \
     && chown nzbget: /data
 VOLUME /data
 USER nzbget
-RUN curl -o /tmp/nzbget.run -L https://nzbget.net/download/nzbget-latest-bin-linux.run \
-    && sh /tmp/nzbget.run --destdir /usr/src/nzbget \
-    && rm -rf /tmp/*
+RUN curl -o /tmp/nzbget.run -L "https://nzbget.net/download/nzbget-latest-bin-linux.run" \
+    && sh /tmp/nzbget.run --destdir /usr/src/nzbget
+
+RUN curl -o /tmp/nzbToMedia.zip -L "https://github.com/clinton-hall/nzbToMedia/archive/master.zip" \
+    && 7z x /tmp/nzbToMedia.zip -o"/usr/src/nzbget/scripts"
+
 
 ENTRYPOINT ["./nzbget", "-s", "-o", "outputmode=log"]
 CMD ["-c", "/data/nzbget.conf"]
