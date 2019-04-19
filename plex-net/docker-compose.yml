@@ -88,6 +88,13 @@ services:
       - /mnt/media/Downloads/Torrents:/downloads
       - /etc/localtime:/etc/localtime:ro
     restart: always
+  mellow:
+    image: voidp/mellow
+    ports:
+      - "5060:5060"
+    volumes:
+      - mellow_data:/usr/src/app/data
+    restart: always
 volumes:
   cp_data:
   tautulli_data:
@@ -96,3 +103,4 @@ volumes:
   ombi_data:
   medusa_data:
   transmission_data:
+  mellow_data:
