@@ -1,4 +1,4 @@
-from modules import chalicecollectibles
+from modules import chalicecollectibles, galactictoys
 import asyncio
 import logging
 import requests
@@ -53,7 +53,8 @@ def callback(products):
 def main():
     asyncio.get_event_loop().call_soon(
         chalicecollectibles.do_loop, callback, asyncio.get_event_loop())
-
+    asyncio.get_event_loop().call_soon(
+        galactictoys.do_loop, callback, asyncio.get_event_loop())
     try:
         asyncio.get_event_loop().run_forever()
     except Exception as e:
