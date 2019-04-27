@@ -1,0 +1,8 @@
+[Unit]
+Description=Sync authorized SSH keys with github
+
+[Service]
+Environment=GITHUB_USER=changeme
+Environment=AUTHORIZED_HOSTS=%h/.ssh/authorized_hosts
+Type=oneshot
+ExecStart=/usr/bin/docker run --rm -e GITHUB_USER=${GITHUB_USER} -v ${AUTHORIZED_HOSTS}:/usr/src/app/authorized_hosts imdevinc/sshcheck
