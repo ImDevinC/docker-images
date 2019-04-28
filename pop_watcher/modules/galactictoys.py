@@ -9,49 +9,17 @@ ROOT_URL = 'https://galactictoys.com'
 PREORDER_URL = 'https://galactictoys.com/collections/funko-preorders-1?sort_by=created-descending'
 EXCLUSIVE_URL = 'https://galactictoys.com/collections/galactic-toys-funko-exclusives?sort_by=created-descending'
 DELAY_MINUTES = int(os.environ['GALACTIC_CHECK_DELAY'])
-FILENAME = '/data/galactic.txt'
 
 
-def do_loop(callback, loop):
+def do_loop(callback, database, table, loop):
     try:
         logging.debug('Starting loop')
         products = check_products(PREORDER_URL)
         products.update(check_products(EXCLUSIVE_URL))
-        products = remove_dups(products)
-        callback(products)
+        callback(products, database, table)
     except Exception as e:
         logging.error(e)
     asyncio.get_event_loop().call_later(DELAY_MINUTES * 60, do_loop, callback, loop)
-
-
-def remove_dups(new_products):
-    final_products = []
-    old_products = {}
-    if not os.path.isfile(FILENAME):
-        f = open(FILENAME, 'w+')
-        f.close()
-
-    with open(FILENAME, 'r') as f:
-        for line in f:
-            data = line.strip().split(':')
-            old_products[data[0]] = data[1]
-
-    logging.debug('Found {} old products and {} new products'.format(
-        len(old_products), len(new_products)))
-    for product in new_products:
-        if not product in old_products:
-            final_products.append(new_products[product])
-        if product in old_products and new_products[product]['price'] != old_products[product]:
-            new_products[product]['price-change'] = True
-            final_products.append(new_products[product])
-
-    with open(FILENAME, 'w') as f:
-        for product in new_products:
-            f.write('{}:{}\n'.format(product, new_products[product]['price']))
-
-    logging.debug('Found {} new products to send'.format(len(final_products)))
-    return final_products
-
 
 def check_products(url):
     product_list = {}

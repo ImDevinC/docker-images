@@ -1,10 +1,11 @@
-from modules import chalicecollectibles, galactictoys
+import os
 import asyncio
 import logging
 import requests
 import json
-import os
 from ratelimiter import RateLimiter
+from db import Database
+from modules import chalicecollectibles, galactictoys
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -22,8 +23,24 @@ def post(batch):
     except Exception as e:
         logging.error(e)
 
+def remove_dups(database, table, products):
+    product_hashes = ['"{}"'.format(element) for element in products.keys()]
+    product_hashes = ','.join(product_hashes)
+    matching_products = database.get_duplicate_items(table, product_hashes)
 
-def callback(products):
+    for row in matching_products:
+        if products[row[0]]['price'] == row[1]:
+            products.pop(row[0])
+            continue
+        products[row[0]]['price-change'] = True
+    
+    database.save_products_to_table(table, products)
+    return list(products.values())
+
+def callback(products, database, table):
+    logging.debug('Found {} products for table {}'.format(len(products), table))
+    products = remove_dups(database, table, products)
+    logging.debug('{} new products to report after removing dups'.format(len(products)))
     embeds = []
     for product in products:
         color = '32768'
@@ -50,11 +67,11 @@ def callback(products):
         post(batch)
 
 
-def main():
+def main(database):
     asyncio.get_event_loop().call_soon(
-        chalicecollectibles.do_loop, callback, asyncio.get_event_loop())
+        chalicecollectibles.do_loop, callback, database, 'chalice_collectibles', asyncio.get_event_loop())
     asyncio.get_event_loop().call_soon(
-        galactictoys.do_loop, callback, asyncio.get_event_loop())
+        galactictoys.do_loop, callback, database, 'galactic_toys', asyncio.get_event_loop())
     try:
         asyncio.get_event_loop().run_forever()
     except Exception as e:
@@ -62,4 +79,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    database = Database('/data/db.sqlite')
+    database.do_migrations(os.path.dirname(os.path.abspath(__file__)) + '/migrations')
+    main(database)
