@@ -23,6 +23,7 @@ def post(batch):
     except Exception as e:
         logging.error(e)
 
+
 def remove_dups(database, table, products):
     product_hashes = ['"{}"'.format(element) for element in products.keys()]
     product_hashes = ','.join(product_hashes)
@@ -33,14 +34,17 @@ def remove_dups(database, table, products):
             products.pop(row[0])
             continue
         products[row[0]]['price-change'] = True
-    
+
     database.save_products_to_table(table, products)
     return list(products.values())
 
+
 def callback(products, database, table):
-    logging.debug('Found {} products for table {}'.format(len(products), table))
+    logging.debug('Found {} products for table {}'.format(
+        len(products), table))
     products = remove_dups(database, table, products)
-    logging.debug('{} new products to report after removing dups'.format(len(products)))
+    logging.debug(
+        '{} new products to report after removing dups'.format(len(products)))
     embeds = []
     for product in products:
         color = '32768'
@@ -80,5 +84,6 @@ def main(database):
 
 if __name__ == '__main__':
     database = Database('/data/db.sqlite')
-    database.do_migrations(os.path.dirname(os.path.abspath(__file__)) + '/migrations')
+    database.do_migrations(os.path.dirname(
+        os.path.abspath(__file__)) + '/migrations')
     main(database)

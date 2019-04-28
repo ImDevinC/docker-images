@@ -19,7 +19,9 @@ def do_loop(callback, database, table, loop):
         callback(products, database, table)
     except Exception as e:
         logging.error(e)
-    asyncio.get_event_loop().call_later(DELAY_MINUTES * 60, do_loop, callback, loop)
+    asyncio.get_event_loop().call_later(
+        DELAY_MINUTES * 60, do_loop, callback, database, table, loop)
+
 
 def check_products(url):
     product_list = {}
