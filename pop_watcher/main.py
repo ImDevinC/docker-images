@@ -5,7 +5,7 @@ import requests
 import json
 from ratelimiter import RateLimiter
 from db import Database
-from modules import chalicecollectibles, galactictoys
+from modules import chalicecollectibles, galactictoys, hottopic
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -76,6 +76,8 @@ def main(database):
         chalicecollectibles.do_loop, callback, database, 'chalice_collectibles', asyncio.get_event_loop())
     asyncio.get_event_loop().call_soon(
         galactictoys.do_loop, callback, database, 'galactic_toys', asyncio.get_event_loop())
+    asyncio.get_event_loop().call_soon(
+        hottopic.do_loop, callback, database, 'hot_topic', asyncio.get_event_loop())
     try:
         asyncio.get_event_loop().run_forever()
     except Exception as e:
