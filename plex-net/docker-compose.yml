@@ -4,15 +4,12 @@ networks:
 services:
   plex:
     image: plexinc/pms-docker:plexpass
-    ports:
-      - "32400:32400"
     volumes:
       - plex_data:/config
       - /mnt/media:/data
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - plex-net
     restart: always
+    network_mode: host
   nzbget:
     image: imdevinc/nzbget
     ports:
