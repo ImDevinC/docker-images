@@ -1,6 +1,4 @@
 version: '2'
-networks:
-  plex-net:
 services:
   plex:
     image: plexinc/pms-docker:plexpass
@@ -18,8 +16,6 @@ services:
       - /mnt/media/Downloads:/downloads
       - nzbget_data:/data
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - plex-net
     restart: always
   medusa:
     image: imdevinc/medusa
@@ -31,8 +27,6 @@ services:
       - /mnt/media/Anime:/anime
       - /mnt/media/TV Shows:/tv shows
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - plex-net
     restart: always
   couchpotato:
     image: imdevinc/couchpotato
@@ -43,8 +37,6 @@ services:
       - /mnt/media/Movies:/movies
       - /mnt/media/Downloads/CouchPotato:/downloads
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - plex-net
     restart: always
   ombi:
     image: lsiodev/ombi-preview
@@ -53,8 +45,6 @@ services:
     volumes:
       - ombi_data:/config
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - plex-net
     restart: always
   tautulli:
     image: imdevinc/tautulli
@@ -63,8 +53,6 @@ services:
     volumes:
       - tautulli_data:/data
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - plex-net
     restart: always
   nginx:
     image: imdevinc/nginx-plex-net
@@ -72,8 +60,6 @@ services:
       - "80:80"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - plex-net
     restart: always
   transmission:
     image: linuxserver/transmission
