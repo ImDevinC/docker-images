@@ -24,8 +24,10 @@ EXPOSE 8081
 VOLUME /data
 
 USER sickrage
+WORKDIR /usr/src/sickrage
 RUN git clone https://github.com/pymedusa/Medusa.git /usr/src/sickrage \
-    && cd /usr/src/sickrage
+    && git checkout $(git tag | tail -n1) \
+    && git pull
 
 ENTRYPOINT ["python", "SickBeard.py", "--nolaunch"]
 CMD ["--datadir", "/data"]
