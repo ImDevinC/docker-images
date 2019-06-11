@@ -26,8 +26,7 @@ VOLUME /data
 USER sickrage
 WORKDIR /usr/src/sickrage
 RUN git clone https://github.com/pymedusa/Medusa.git /usr/src/sickrage \
-    && git checkout $(git tag | tail -n1) \
-    && git pull
+    && git checkout $(git tag | tail -n1)
 
 ENTRYPOINT ["python", "SickBeard.py", "--nolaunch"]
 CMD ["--datadir", "/data"]
