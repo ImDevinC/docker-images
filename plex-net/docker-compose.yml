@@ -54,13 +54,6 @@ services:
       - tautulli_data:/data
       - /etc/localtime:/etc/localtime:ro
     restart: always
-  nginx:
-    image: imdevinc/nginx-plex-net:latest
-    ports:
-      - "80:80"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-    restart: always
   transmission:
     image: linuxserver/transmission
     ports:
