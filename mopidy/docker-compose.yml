@@ -1,0 +1,16 @@
+version: '2'
+services:
+  mopidy:
+    build: ./
+    image: mopidy
+    volumes: 
+      - mopidy_data:/home/mopidy/.local/share/mopidy
+    ports:
+      - "6680:6680"
+      - "6600:6600"
+      - "5555:5555"
+    environment:
+      - "PULSE_SERVER=tcp:192.168.1.250:4713"
+    restart: always
+volumes:
+  mopidy_data:
