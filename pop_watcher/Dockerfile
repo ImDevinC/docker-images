@@ -7,7 +7,7 @@ COPY . .
 RUN pip install -r requirements.txt
 
 ENV WEBHOOK_URL=
-ENV CHALICE_CHECK_DELAY=
+ENV CHECK_DELAY=
 ENV BATCHES_PER_MINUTE=
 
 ENTRYPOINT [ "python", "main.py"]

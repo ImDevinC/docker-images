@@ -5,16 +5,20 @@ import requests
 import json
 from ratelimiter import RateLimiter
 from db import Database
-from modules import chalicecollectibles, galactictoys, hottopic
+#from modules import chalicecollectibles, galactictoys, hottopic, funko
+from modules import funko
 
 logging.basicConfig(level=logging.DEBUG)
 
-WEBHOOK_URL = os.environ['WEBHOOK_URL']
-BATCHES_PER_MINUTE = int(os.environ['BATCHES_PER_MINUTE'])
+WEBHOOK_URL = os.environ.get('WEBHOOK_URL', None)
+BATCHES_PER_MINUTE = int(os.environ.get('BATCHES_PER_MINUTE', 3))
 
 
 @RateLimiter(max_calls=BATCHES_PER_MINUTE, period=60)
 def post(batch):
+    if not WEBHOOK_URL:
+        logging.info(json.dumps({'embeds': batch}))
+        return
     data = {'embeds': batch}
     try:
         r = requests.post(WEBHOOK_URL, data=json.dumps(data), headers={
@@ -72,12 +76,14 @@ def callback(products, database, table):
 
 
 def main(database):
+    # asyncio.get_event_loop().call_soon(
+    #     chalicecollectibles.do_loop, callback, database, 'chalice_collectibles', asyncio.get_event_loop())
+    # asyncio.get_event_loop().call_soon(
+    #     galactictoys.do_loop, callback, database, 'galactic_toys', asyncio.get_event_loop())
+    # asyncio.get_event_loop().call_soon(
+    #     hottopic.do_loop, callback, database, 'hot_topic', asyncio.get_event_loop())
     asyncio.get_event_loop().call_soon(
-        chalicecollectibles.do_loop, callback, database, 'chalice_collectibles', asyncio.get_event_loop())
-    asyncio.get_event_loop().call_soon(
-        galactictoys.do_loop, callback, database, 'galactic_toys', asyncio.get_event_loop())
-    asyncio.get_event_loop().call_soon(
-        hottopic.do_loop, callback, database, 'hot_topic', asyncio.get_event_loop())
+        funko.do_loop, callback, database, 'funko', asyncio.get_event_loop())
     try:
         asyncio.get_event_loop().run_forever()
     except Exception as e:
