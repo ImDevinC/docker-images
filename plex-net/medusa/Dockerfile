@@ -6,9 +6,10 @@ FROM alpine:latest
 LABEL maintainer Devin Collins <me@imdevinc.com>
 WORKDIR /usr/src/sickrage
 
-RUN apk add --no-cache \
+RUN apk update && \
+    apk add --no-cache \
     git \
-    python \
+    python2 \
     shadow \
     unrar \
     openssl \
@@ -26,7 +27,7 @@ VOLUME /data
 USER sickrage
 WORKDIR /usr/src/sickrage
 RUN git clone https://github.com/pymedusa/Medusa.git /usr/src/sickrage \
-    && git checkout $(git tag | tail -n1)
+    && git checkout $(git tag | sort -V | tail -n1)
 
 ENTRYPOINT ["python", "SickBeard.py", "--nolaunch"]
 CMD ["--datadir", "/data"]
