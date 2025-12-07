@@ -1,0 +1,55 @@
+name: Publish Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        type: choice
+        description: Image to build
+        required: true
+        options:
+          - n8n
+          - sshcheck
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/ImDevinC/${{ github.event.inputs.image }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/ImDevinC/docker-images/${{ github.event.inputs.image }}/Dockerfile
+            org.opencontainers.image.title=${{ github.event.inputs.image }}
+          tags: |
+            latest
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}}.{{patch}}
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          platforms: linux/amd64
+          context: ./${{ github.event.inputs.image }}
+          file: ./${{ github.event.inputs.image }}/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
