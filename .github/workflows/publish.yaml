@@ -10,6 +10,7 @@ on:
         options:
           - n8n
           - sshcheck
+          - comfyui
 
 jobs:
   publish:
@@ -21,6 +22,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Init image
+        if: ${{ hashFiles(format('{0}/init.sh', env.IMAGE)) != '' }}
+        working-directory: ${{ env.IMAGE }}
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/${IMAGE}/init.sh"
+          "${GITHUB_WORKSPACE}/${IMAGE}/init.sh"
+        env:
+          IMAGE: ${{ github.event.inputs.image }}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
       - name: Setup Docker Buildx
@@ -49,7 +58,6 @@ jobs:
         with:
           push: true
           platforms: linux/amd64
-          context: ./${{ github.event.inputs.image }}
-          file: ./${{ github.event.inputs.image }}/Dockerfile
+          context: ${{ github.event.inputs.image }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
