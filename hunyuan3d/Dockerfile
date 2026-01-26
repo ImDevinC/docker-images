@@ -56,7 +56,7 @@ COPY --chown=hunyuan:hunyuan ./src/requirements.txt /app/
 # Install PyTorch with CUDA support (specify version for reproducibility)
 RUN pip install --no-cache-dir \
     torch==2.5.1 \
-    torchvision==0.20.0 \
+    torchvision==0.20.1 \
     torchaudio==2.5.1 \
     --index-url https://download.pytorch.org/whl/cu124
 
