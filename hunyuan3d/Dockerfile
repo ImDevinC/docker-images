@@ -60,6 +60,10 @@ RUN pip install --no-cache-dir \
     torchaudio==2.5.1 \
     --index-url https://download.pytorch.org/whl/cu124
 
+RUN pip install --no-cache-dir \
+    bpy==4.0 \
+    --index-url https://download.blender.org/pypi/
+
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
