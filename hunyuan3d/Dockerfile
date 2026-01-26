@@ -71,9 +71,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY --chown=hunyuan:hunyuan ./src/ /app/
 
-# Install the package
-RUN pip install --no-cache-dir -e .
-
 # Set CUDA architectures for RTX 3070 (8.6) and RTX 4070 Ti (8.9)
 # 8.6 = Ampere (RTX 30xx series)
 # 8.9+PTX = Ada Lovelace (RTX 40xx series) with PTX fallback for future GPUs
