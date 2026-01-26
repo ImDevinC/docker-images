@@ -1,6 +1,6 @@
 # Hunyuan3D-2 Secure Docker Image
 # Base image with CUDA support for GPU acceleration
-FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
 # Set environment variables for non-interactive installation
 ENV DEBIAN_FRONTEND=noninteractive \
