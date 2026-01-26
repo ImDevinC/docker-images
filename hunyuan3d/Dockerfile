@@ -79,7 +79,7 @@ ENV TORCH_CUDA_ARCH_LIST="8.6;8.9+PTX"
 # Build custom CUDA extensions
 # Custom rasterizer
 RUN cd /app/hy3dpaint/custom_rasterizer && \
-    pip install -e . && \
+    pip install -e . --no-build-isolation && \
     cd /app
 RUN cd /app/hy3dpaint/DifferentiableRenderer && \
     bash compile_mesh_painter.sh && \
