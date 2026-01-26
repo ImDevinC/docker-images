@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     ninja-build \
     git \
+    wget \
     # Python
     python3.10 \
     python3.10-dev \
