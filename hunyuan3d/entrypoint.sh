@@ -41,8 +41,8 @@ run_gradio() {
         --model_path "$MODEL_PATH" \
         --subfolder "$SUBFOLDER" \
         --texgen_model_path "$TEXGEN_MODEL_PATH" \
-        --server_name "$HOST" \
-        --server_port "$GRADIO_PORT" \
+        --host "$HOST" \
+        --port "$GRADIO_PORT" \
         $VRAM_FLAG \
         $FLASHVDM_FLAG
 }
