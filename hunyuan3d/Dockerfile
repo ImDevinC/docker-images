@@ -1,118 +1,90 @@
-# Hunyuan3D-2 Secure Docker Image
-# Base image with CUDA support for GPU acceleration
-FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+# get the development image from nvidia cuda 12.4 (using devel for full CUDA toolkit)
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
 
-# Set environment variables for non-interactive installation
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+LABEL name="hunyuan3d21" maintainer="hunyuan3d21"
 
-# Security: Set timezone and locale
-ENV TZ=UTC \
-    LANG=C.UTF-8 \
-    LC_ALL=C.UTF-8
+# create workspace folder and set it as working directory
+RUN mkdir -p /workspace
+WORKDIR /workspace
 
-# Create non-root user for security
-RUN groupadd -r hunyuan -g 1000 && \
-    useradd -r -u 1000 -g hunyuan -m -s /bin/bash hunyuan && \
-    mkdir -p /app /models /cache && \
-    chown -R hunyuan:hunyuan /app /models /cache
+# update package lists and install git, wget, vim, libegl1-mesa-dev, and libglib2.0-0
+RUN apt-get update && apt-get install -y build-essential git wget vim libegl1-mesa-dev libglib2.0-0 unzip git-lfs
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Build tools
-    build-essential \
-    cmake \
-    ninja-build \
-    git \
-    wget \
-    # Python
-    python3.10 \
-    python3.10-dev \
-    python3-pip \
-    # Graphics libraries
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    # Cleanup
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && ln -sf /usr/bin/python3.10 /usr/bin/python
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends pkg-config libglvnd0 libgl1 libglx0 libegl1 libgles2 libglvnd-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev cmake curl mesa-utils-extra libxrender1
 
-# Upgrade pip and install build dependencies
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir pybind11 ninja packaging
+# Install additional dependencies for compilation
+RUN apt-get install -y libeigen3-dev python3-dev python3-setuptools libcgal-dev
 
-# Set working directory
-WORKDIR /app
+# Install Python 3.10 and pip
+RUN apt-get install -y python3.10 python3.10-dev python3-pip python3.10-venv
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1
 
-# Copy requirements first for better caching
-COPY --chown=hunyuan:hunyuan ./src/requirements.txt /app/
+# Install pip for python3.10
+RUN python3.10 -m pip install --upgrade pip
 
-# Install PyTorch with CUDA support (specify version for reproducibility)
-RUN pip install --no-cache-dir \
-    torch==2.5.1 \
-    torchvision==0.20.1 \
-    torchaudio==2.5.1 \
-    --index-url https://download.pytorch.org/whl/cu124
+# Install Ninja
+RUN pip install ninja
 
-RUN wget https://download.blender.org/pypi/bpy/bpy-4.0.0-cp310-cp310-manylinux_2_28_x86_64.whl && \
-    pip install --no-cache-dir bpy-4.0.0-cp310-cp310-manylinux_2_28_x86_64.whl && \
-    rm bpy-4.0.0-cp310-cp310-manylinux_2_28_x86_64.whl
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
+ENV PYOPENGL_PLATFORM=egl
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
-COPY --chown=hunyuan:hunyuan ./src/ /app/
-
-# Set CUDA architectures for RTX 3070 (8.6) and RTX 4070 Ti (8.9)
-# 8.6 = Ampere (RTX 30xx series)
-# 8.9+PTX = Ada Lovelace (RTX 40xx series) with PTX fallback for future GPUs
+# Set CUDA environment variables
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 ENV TORCH_CUDA_ARCH_LIST="8.6;8.9+PTX"
 
-# Build custom CUDA extensions
-# Custom rasterizer
-RUN cd /app/hy3dpaint/custom_rasterizer && \
-    pip install -e . --no-build-isolation && \
-    cd /app
-RUN cd /app/hy3dpaint/DifferentiableRenderer && \
-    bash compile_mesh_painter.sh && \
-    cd /app
-RUN wget https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth -P hy3dpaint/ckpt
+RUN pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
 
-# Security: Remove unnecessary files and set proper permissions
-COPY --chown=hunyuan:hunyuan ./entrypoint.sh /app/entrypoint.sh
-RUN find /app -type f -name "*.pyc" -delete && \
-    find /app -type d -name "__pycache__" -delete && \
-    chmod -R 755 /app && \
-    chmod +x /app/entrypoint.sh
+# Copy Hunyuan3D-2.1 repository from src/ directory
+COPY src/ /workspace/Hunyuan3D-2.1/
 
-# Set cache directories with proper permissions
-ENV HF_HOME=/cache/huggingface \
-    TORCH_HOME=/cache/torch \
-    TRANSFORMERS_CACHE=/cache/huggingface/transformers
+# Install Python dependencies from modified requirements.txt
+RUN pip install bpy==4.0 --extra-index-url https://download.blender.org/pypi/
+RUN pip install -r Hunyuan3D-2.1/requirements.txt
 
-RUN mkdir -p $HF_HOME $TORCH_HOME $TRANSFORMERS_CACHE && \
-    chown -R hunyuan:hunyuan /cache
+# Install custom_rasterizer
+RUN cd /workspace/Hunyuan3D-2.1/hy3dpaint/custom_rasterizer && \
+    # Set compilation environment variables
+    export TORCH_CUDA_ARCH_LIST="8.6;8.9+PTX" && \
+    export CUDA_NVCC_FLAGS="-allow-unsupported-compiler" && \
+    # Install with editable mode
+    pip install . --no-build-isolation
 
-# Switch to non-root user
-USER hunyuan
+# Install DifferentiableRenderer
+RUN cd /workspace/Hunyuan3D-2.1/hy3dpaint/DifferentiableRenderer && \
+    bash compile_mesh_painter.sh
 
-# Expose ports for Gradio and API server
-EXPOSE 7860 8080
+# Create ckpt folder in hy3dpaint and download RealESRGAN model
+RUN cd /workspace/Hunyuan3D-2.1/hy3dpaint && \
+    mkdir -p ckpt && \
+    wget https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth -P ckpt
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD python -c "import torch; import hy3dgen" || exit 1
+# Modify textureGenPipeline.py to update config path
+RUN cd /workspace/Hunyuan3D-2.1/hy3dpaint && \
+    sed -i 's/self\.multiview_cfg_path = "cfgs\/hunyuan-paint-pbr\.yaml"/self.multiview_cfg_path = "hy3dpaint\/cfgs\/hunyuan-paint-pbr.yaml"/' textureGenPipeline.py
 
-# Set entrypoint
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Modify multiview_utils.py to update custom_pipeline path
+RUN cd /workspace/Hunyuan3D-2.1/hy3dpaint/utils && \
+    sed -i 's/custom_pipeline = config\.custom_pipeline/custom_pipeline = os.path.join(os.path.dirname(__file__),"..","hunyuanpaintpbr")/' multiview_utils.py
 
-# Default command (can be overridden)
-CMD ["gradio"]
+# Set working directory to the cloned repository
+WORKDIR /workspace/Hunyuan3D-2.1
+
+RUN apt-get install -y libxi6 libgconf-2-4 libxkbcommon-x11-0 libsm6 libxext6 libxrender-dev
+
+#exposing 7860 port
+EXPOSE 7860
+
+# Cleanup
+RUN rm -f /workspace/*.zip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set default command
+WORKDIR /workspace/Hunyuan3D-2.1
+RUN mkdir gradio_cache
+CMD ["python", "gradleo_app.py", "--port", "7860", "--server", "0.0.0.0"]
