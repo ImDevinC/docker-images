@@ -51,7 +51,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 WORKDIR /app
 
 # Copy requirements first for better caching
-COPY --chown=hunyuan:hunyuan requirements.txt /app/
+COPY --chown=hunyuan:hunyuan ./src/requirements.txt /app/
 
 # Install PyTorch with CUDA support (specify version for reproducibility)
 RUN pip install --no-cache-dir \
@@ -63,7 +63,7 @@ RUN pip install --no-cache-dir \
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY --chown=hunyuan:hunyuan . /app/
+COPY --chown=hunyuan:hunyuan ./src /app/
 
 # Install the package
 RUN pip install --no-cache-dir -e .
