@@ -63,10 +63,15 @@ RUN pip install --no-cache-dir \
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY --chown=hunyuan:hunyuan ./src /app/
+COPY --chown=hunyuan:hunyuan ./src/ /app/
 
 # Install the package
 RUN pip install --no-cache-dir -e .
+
+# Set CUDA architectures for RTX 3070 (8.6) and RTX 4070 Ti (8.9)
+# 8.6 = Ampere (RTX 30xx series)
+# 8.9+PTX = Ada Lovelace (RTX 40xx series) with PTX fallback for future GPUs
+ENV TORCH_CUDA_ARCH_LIST="8.6;8.9+PTX"
 
 # Build custom CUDA extensions
 # Custom rasterizer
@@ -80,6 +85,7 @@ RUN cd /app/hy3dgen/texgen/differentiable_renderer && \
     cd /app
 
 # Security: Remove unnecessary files and set proper permissions
+COPY --chown=hunyuan:hunyuan ./entrypoint.sh /app/entrypoint.sh
 RUN find /app -type f -name "*.pyc" -delete && \
     find /app -type d -name "__pycache__" -delete && \
     chmod -R 755 /app && \
