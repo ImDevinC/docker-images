@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  hunyuan3d:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hunyuan3d:latest
+    container_name: hunyuan3d
+    
+    # GPU support
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: false  # Need write access for model caching
+    user: "1000:1000"
+    
+    # Network
+    ports:
+      - "7860:7860"  # Gradio
+      - "8080:8080"  # API (optional)
+    
+    # Environment variables
+    environment:
+      - MODEL_PATH=tencent/Hunyuan3D-2
+      - SUBFOLDER=hunyuan3d-dit-v2-0
+      - TEXGEN_MODEL_PATH=tencent/Hunyuan3D-2
+      - LOW_VRAM_MODE=false
+      - ENABLE_FLASHVDM=false
+      - GRADIO_PORT=7860
+      - API_PORT=8080
+      # Uncomment and set your HuggingFace token if needed
+      # - HF_TOKEN=${HF_TOKEN}
+    
+    # Volumes
+    volumes:
+      - ./models:/models
+      - ./cache:/cache
+      - ./outputs:/app/outputs
+    
+    # Resource limits
+    mem_limit: 32g
+    memswap_limit: 32g
+    cpus: 8
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import torch; import hy3dgen"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    driver: bridge

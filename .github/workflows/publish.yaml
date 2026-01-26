@@ -11,6 +11,7 @@ on:
           - n8n
           - sshcheck
           - comfyui
+          - hunyuan3d
 
 jobs:
   publish:
