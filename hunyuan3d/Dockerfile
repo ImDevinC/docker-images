@@ -55,9 +55,10 @@ COPY --chown=hunyuan:hunyuan ./src/requirements.txt /app/
 
 # Install PyTorch with CUDA support (specify version for reproducibility)
 RUN pip install --no-cache-dir \
-    torch==2.1.0 \
-    torchvision==0.16.0 \
-    --index-url https://download.pytorch.org/whl/cu121
+    torch==2.5.1 \
+    torchvision==0.20.0 \
+    torchaudio==2.5.1 \
+    --index-url https://download.pytorch.org/whl/cu124
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -75,14 +76,13 @@ ENV TORCH_CUDA_ARCH_LIST="8.6;8.9+PTX"
 
 # Build custom CUDA extensions
 # Custom rasterizer
-RUN cd /app/hy3dgen/texgen/custom_rasterizer && \
-    python setup.py install && \
+RUN cd /app/hy3dpaint/custom_rasterizer && \
+    pip install -e . && \
     cd /app
-
-# Differentiable renderer
-RUN cd /app/hy3dgen/texgen/differentiable_renderer && \
-    python setup.py install && \
+RUN cd /app/hy3dpaint/DifferentiableRenderer && \
+    bash compile_mesh_painter.sh && \
     cd /app
+RUN wget https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth -P hy3dpaint/ckpt
 
 # Security: Remove unnecessary files and set proper permissions
 COPY --chown=hunyuan:hunyuan ./entrypoint.sh /app/entrypoint.sh

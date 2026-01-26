@@ -14,9 +14,9 @@ MODE="${1:-gradio}"
 HOST="${HOST:-0.0.0.0}"
 GRADIO_PORT="${GRADIO_PORT:-7860}"
 API_PORT="${API_PORT:-8080}"
-MODEL_PATH="${MODEL_PATH:-tencent/Hunyuan3D-2}"
-SUBFOLDER="${SUBFOLDER:-hunyuan3d-dit-v2-0}"
-TEXGEN_MODEL_PATH="${TEXGEN_MODEL_PATH:-tencent/Hunyuan3D-2}"
+MODEL_PATH="${MODEL_PATH:-tencent/Hunyuan3D-2.1}"
+SUBFOLDER="${SUBFOLDER:-hunyuan3d-dit-v2-1}"
+TEXGEN_MODEL_PATH="${TEXGEN_MODEL_PATH:-tencent/Hunyuan3D-2.1}"
 
 # Function to run Gradio app
 run_gradio() {

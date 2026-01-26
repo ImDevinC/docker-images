@@ -28,4 +28,4 @@ sudo rm -rf /usr/local/lib/android
 sudo rm -rf /usr/local/lib/node_modules
 df -h
 
-git clone https://github.com/Tencent-Hunyuan/Hunyuan3D-2.git ./src
+git clone https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1.git ./src
