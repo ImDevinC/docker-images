@@ -71,9 +71,10 @@ RUN cd /workspace/Hunyuan3D-2.1/hy3dpaint && \
 RUN cd /workspace/Hunyuan3D-2.1/hy3dpaint/utils && \
     sed -i 's/custom_pipeline = config\.custom_pipeline/custom_pipeline = os.path.join(os.path.dirname(__file__),"..","hunyuanpaintpbr")/' multiview_utils.py
 
-# Fix uvicorn root_path to prevent 307 redirects behind reverse proxy
+# Fix uvicorn configuration to prevent 307 redirects behind reverse proxy
+# This adds: root_path="", proxy_headers=True, and redirect_slashes=False
 RUN cd /workspace/Hunyuan3D-2.1 && \
-    sed -i 's/uvicorn\.run(app, host=args\.host, port=args\.port)/uvicorn.run(app, host=args.host, port=args.port, root_path="")/' gradio_app.py
+    sed -i 's/uvicorn\.run(app, host=args\.host, port=args\.port)/uvicorn.run(app, host=args.host, port=args.port, root_path="", proxy_headers=True, forwarded_allow_ips="*")/' gradio_app.py
 
 # Set working directory to the cloned repository
 WORKDIR /workspace/Hunyuan3D-2.1
