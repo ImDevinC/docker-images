@@ -72,4 +72,4 @@ fi
 
 # Run command as comfyui
 echo "[entrypoint] Running command"
-exec su -c "$*" comfyui
+exec su -c "$*" comfyui "$@"
