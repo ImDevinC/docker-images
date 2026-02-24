@@ -5,8 +5,10 @@
 # Use the recommended Python version 3.12, as specified in the README.
 FROM python:3.12.11-bookworm
 
-# Install cmake, which is an indirect installation dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends cmake
+ARG VERSION
+
+# Install cmake and git
+RUN apt-get update && apt-get install -y --no-install-recommends cmake git
 
 # Create a mount point for user-generated data.
 RUN mkdir -p      \
@@ -30,6 +32,12 @@ RUN chown comfyui:comfyui .
 # Install ComfyUI as ComfyUI
 USER comfyui
 
+# Clone ComfyUI repository and checkout the specified version
+RUN git clone https://github.com/Comfy-Org/ComfyUI.git . && \
+    if [ -n "$VERSION" ]; then \
+        git checkout "v${VERSION}"; \
+    fi
+
 # Set up a Python virtual environment and configure it as the default Python.
 #
 # Reasons for using a virtual environment:
@@ -44,11 +52,9 @@ ENV PATH="/comfyui/.venv/bin:$PATH"
 # Install Python dependencies. This step is also performed automatically by the
 # entrypoint script, but doing it at build time reduces startup time on the
 # first run.
-COPY ./src/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install ComfyUI and link the data mount points.
-COPY ./src/ ./
+# Link the data mount points (files are already in place from git clone)
 #RUN ln -sf /data/* .
 
 # Purely declarative: inform Docker and image users that this image is designed
