@@ -50,7 +50,7 @@ jobs:
           SHORT_SHA="${GITHUB_SHA:0:7}"
           IMAGE="ghcr.io/imdevinc/${{ github.event.inputs.image }}"
           
-          # Parse version components
+          # Parse version components and strip 'v' prefix if present
           if [[ $VERSION =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
             MAJOR="${BASH_REMATCH[1]}"
             MINOR="${BASH_REMATCH[2]}"
@@ -60,6 +60,9 @@ jobs:
             exit 1
           fi
           
+          # Store the stripped version (without 'v') for build args
+          CLEAN_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          
           # Generate tag list
           TAGS="${IMAGE}:latest"
           TAGS="${TAGS},${IMAGE}:v${MAJOR}"
@@ -68,6 +71,7 @@ jobs:
           TAGS="${TAGS},${IMAGE}:${SHORT_SHA}"
           
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          echo "version=${CLEAN_VERSION}" >> $GITHUB_OUTPUT
       - name: Get metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -86,4 +90,4 @@ jobs:
           tags: ${{ steps.tags.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            VERSION=${{ github.event.inputs.version }}
+            VERSION=${{ steps.tags.outputs.version }}
