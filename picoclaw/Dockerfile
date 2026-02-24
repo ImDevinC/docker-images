@@ -5,6 +5,8 @@ FROM golang:1.25-alpine AS builder
 
 LABEL maintainer="Devin Collins <me@imdevinc.com>"
 
+ARG VERSION
+
 # Install build dependencies
 RUN apk add --no-cache \
     git \
@@ -14,8 +16,11 @@ RUN apk add --no-cache \
 
 WORKDIR /build
 
-# Clone the repository
-RUN git clone https://github.com/sipeed/picoclaw.git .
+# Clone the repository and checkout the specified version
+RUN git clone https://github.com/sipeed/picoclaw.git . && \
+    if [ -n "$VERSION" ]; then \
+        git checkout "v${VERSION}"; \
+    fi
 
 # Build the application
 RUN make deps && \

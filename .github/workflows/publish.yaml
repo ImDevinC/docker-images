@@ -13,6 +13,10 @@ on:
           - comfyui
           - hunyuan3d
           - picoclaw
+      version:
+        type: string
+        description: Version tag (e.g., 1.2.3)
+        required: true
 
 jobs:
   publish:
@@ -42,6 +46,31 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate tags
+        id: tags
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          IMAGE="ghcr.io/imdevinc/${{ github.event.inputs.image }}"
+          
+          # Parse version components
+          if [[ $VERSION =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+            PATCH="${BASH_REMATCH[3]}"
+          else
+            echo "Error: Version must be in format X.Y.Z or vX.Y.Z"
+            exit 1
+          fi
+          
+          # Generate tag list
+          TAGS="${IMAGE}:latest"
+          TAGS="${TAGS},${IMAGE}:v${MAJOR}"
+          TAGS="${TAGS},${IMAGE}:v${MAJOR}.${MINOR}"
+          TAGS="${TAGS},${IMAGE}:v${MAJOR}.${MINOR}.${PATCH}"
+          TAGS="${TAGS},${IMAGE}:${SHORT_SHA}"
+          
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
       - name: Get metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -50,17 +79,14 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/ImDevinC/docker-images/${{ github.event.inputs.image }}/Dockerfile
             org.opencontainers.image.title=${{ github.event.inputs.image }}
-          tags: |
-            latest
-            type=sha
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}
-            type=semver,pattern={{major}}.{{minor}}.{{patch}}
+            org.opencontainers.image.version=${{ github.event.inputs.version }}
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           push: true
           platforms: linux/amd64
           context: ${{ github.event.inputs.image }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ github.event.inputs.version }}
