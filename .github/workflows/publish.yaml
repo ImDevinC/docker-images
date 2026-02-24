@@ -12,6 +12,7 @@ on:
           - sshcheck
           - comfyui
           - hunyuan3d
+          - picoclaw
 
 jobs:
   publish:
