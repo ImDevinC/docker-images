@@ -8,10 +8,7 @@ on:
         description: Image to build
         required: true
         options:
-          - n8n
-          - sshcheck
           - comfyui
-          - hunyuan3d
           - picoclaw
       version:
         type: string
