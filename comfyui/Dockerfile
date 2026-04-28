@@ -84,6 +84,7 @@ CMD [ "python", "./main.py" ]
 
 # Install additional system dependencies
 ARG APT_EXTRA_PACKAGES
-RUN apt-get install -y --no-install-recommends $APT_EXTRA_PACKAGES \
+RUN apt-get install -y --no-install-recommends libgl1-mesa-glx libglib2.0-0 \
+  $APT_EXTRA_PACKAGES \
 	&& apt-get clean                                               \
 	&& rm -rf /var/lib/apt/lists/*
